@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Love in Bloom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=Dancing+Script:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --wine-deep:#3a0d1a;
+    --wine-mid:#5c1a2b;
+    --rose:#d1275a;
+    --rose-dark:#a01a45;
+    --rose-soft:#f4c9d1;
+    --gold:#c9a24b;
+    --gold-soft:#e6c877;
+    --paper:#fff8f3;
+    --ink:#3a1620;
+    --ink-soft:#7a4a55;
+    --ribbon:rgba(244,201,209,0.85);
+    --ok:#7a8f4c;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Poppins',sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    position:relative;
+    overflow-x:hidden;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(209,39,90,0.16) 0, transparent 38%),
+      radial-gradient(circle at 85% 20%, rgba(201,162,75,0.12) 0, transparent 32%),
+      radial-gradient(circle at 15% 85%, rgba(209,39,90,0.14) 0, transparent 34%),
+      radial-gradient(circle at 90% 90%, rgba(244,201,209,0.10) 0, transparent 30%),
+      linear-gradient(160deg, var(--wine-deep) 0%, var(--wine-mid) 55%, var(--wine-deep) 100%);
+  }
+
+  /* ---- ambient rose decoration ---- */
+  .bg-rose{
+    position:fixed;
+    width:340px; height:340px;
+    background:var(--rose-svg);
+    opacity:0.06;
+    pointer-events:none;
+    z-index:0;
+  }
+  .bg-rose--1{ top:-60px; left:-80px; transform:rotate(-15deg); }
+  .bg-rose--2{ bottom:-100px; right:-90px; width:420px; height:420px; transform:rotate(20deg); }
+  .bg-rose--3{ top:40%; right:-120px; width:260px; height:260px; transform:rotate(-30deg); opacity:0.045; }
+
+  .board-frame{
+    position:relative;
+    z-index:1;
+    max-width:1100px;
+    margin:0 auto;
+    padding:44px 24px 90px;
+  }
+  header{
+    text-align:center;
+    margin-bottom:6px;
+  }
+  .header-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+  }
+  .rose-flourish{
+    width:34px; height:34px;
+    background:var(--rose-svg);
+    flex:none;
+    filter:drop-shadow(0 2px 3px rgba(0,0,0,0.35));
+  }
+  .rose-flourish.left{transform:rotate(-18deg);}
+  .rose-flourish.right{transform:rotate(18deg) scaleX(-1);}
+  header h1{
+    font-family:'Playfair Display', serif;
+    font-style:italic;
+    font-weight:700;
+    font-size:58px;
+    line-height:1;
+    color:var(--rose-soft);
+    text-shadow:0 3px 14px rgba(0,0,0,0.45);
+    margin:0;
+  }
+  header p{
+    font-family:'Poppins',sans-serif;
+    font-size:14px;
+    color:var(--rose-soft);
+    opacity:0.82;
+    margin:10px 0 0;
+    letter-spacing:0.03em;
+  }
+  .divider{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    max-width:340px;
+    margin:22px auto 40px;
+  }
+  .divider::before,
+  .divider::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:linear-gradient(90deg, transparent, var(--gold-soft), transparent);
+    opacity:0.6;
+  }
+  .divider .rose-flourish{width:20px; height:20px; opacity:0.9;}
+
+  /* ---- upload love-letter card ---- */
+  .upload-card{
+    max-width:340px;
+    margin:0 auto 52px;
+    background:var(--paper);
+    padding:22px 20px 24px;
+    box-shadow:0 16px 34px rgba(0,0,0,0.4);
+    transform:rotate(-0.8deg);
+    position:relative;
+    border-radius:2px;
+  }
+  .upload-card::before{
+    content:"";
+    position:absolute;
+    top:-14px; left:50%;
+    transform:translateX(-50%) rotate(-2deg);
+    width:110px; height:28px;
+    background:var(--ribbon);
+    box-shadow:0 2px 5px rgba(0,0,0,0.25);
+  }
+  .upload-card::after{
+    content:"";
+    position:absolute;
+    top:-15px; left:50%;
+    transform:translateX(-50%);
+    width:22px; height:22px;
+    background:var(--rose-svg);
+    filter:drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+  }
+  .upload-card h2{
+    font-family:'Playfair Display', serif;
+    font-style:italic;
+    font-weight:600;
+    font-size:26px;
+    margin:8px 0 14px;
+    text-align:center;
+    color:var(--ink);
+  }
+  .drop-zone{
+    border:2px dashed var(--rose-soft);
+    border-radius:4px;
+    padding:24px 10px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+    font-size:13px;
+    color:var(--ink-soft);
+    background:rgba(244,201,209,0.12);
+  }
+  .drop-zone.dragover{
+    border-color:var(--rose);
+    background:rgba(209,39,90,0.08);
+  }
+  .drop-zone input{display:none;}
+  .preview-wrap{
+    margin-top:12px;
+    text-align:center;
+  }
+  .preview-wrap img{
+    max-width:100%;
+    max-height:180px;
+    border:1px solid var(--rose-soft);
+  }
+  .upload-actions{
+    display:flex;
+    gap:8px;
+    margin-top:16px;
+  }
+  .upload-actions input[type=text]{
+    flex:1;
+    padding:9px 11px;
+    border:1px solid var(--rose-soft);
+    border-radius:3px;
+    font-size:13px;
+    font-family:'Poppins',sans-serif;
+    background:#fffefc;
+    color:var(--ink);
+  }
+  .upload-actions input[type=text]::placeholder{color:var(--ink-soft); opacity:0.7;}
+  .btn-primary{
+    padding:9px 18px;
+    border:none;
+    border-radius:3px;
+    background:linear-gradient(135deg, var(--rose), var(--rose-dark));
+    color:#fff;
+    font-weight:600;
+    font-size:13px;
+    cursor:pointer;
+    white-space:nowrap;
+    letter-spacing:0.02em;
+  }
+  .btn-primary:disabled{
+    background:#d9b9be;
+    cursor:not-allowed;
+  }
+  .btn-primary:hover:not(:disabled){background:linear-gradient(135deg, var(--rose-dark), var(--rose-dark));}
+
+  /* ---- gallery ---- */
+  .gallery{
+    display:flex;
+    flex-wrap:wrap;
+    gap:38px 30px;
+    justify-content:center;
+    padding-top:8px;
+  }
+  .polaroid{
+    background:var(--paper);
+    padding:14px 14px 12px;
+    width:200px;
+    box-shadow:0 12px 24px rgba(0,0,0,0.4);
+    position:relative;
+    transition:transform .15s ease;
+    border-radius:2px;
+  }
+  .polaroid:nth-child(3n){transform:rotate(-2.5deg);}
+  .polaroid:nth-child(3n+1){transform:rotate(1.8deg);}
+  .polaroid:nth-child(3n+2){transform:rotate(-1deg);}
+  .polaroid:hover{transform:scale(1.05) rotate(0deg); z-index:5;}
+  .pin{
+    position:absolute;
+    top:-11px; left:50%;
+    transform:translateX(-50%);
+    width:26px; height:26px;
+    background:var(--rose-svg);
+    filter:drop-shadow(0 3px 4px rgba(0,0,0,0.5));
+  }
+  .polaroid img{
+    width:100%;
+    height:180px;
+    object-fit:cover;
+    display:block;
+    background:#f1e4e6;
+    cursor:zoom-in;
+  }
+  .caption{
+    font-family:'Dancing Script',cursive;
+    font-weight:600;
+    font-size:21px;
+    text-align:center;
+    margin-top:10px;
+    color:var(--ink);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .card-actions{
+    display:flex;
+    justify-content:space-between;
+    margin-top:8px;
+    padding:0 2px;
+  }
+  .action-link{
+    background:none;
+    border:none;
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:0.04em;
+    cursor:pointer;
+    text-transform:uppercase;
+    opacity:0.65;
+    padding:2px 0;
+  }
+  .action-link:hover{opacity:1; text-decoration:underline;}
+  .share-link{color:var(--rose-dark);}
+  .delete-link{color:var(--ink-soft);}
+
+  /* ---- lightbox ---- */
+  .lightbox{
+    position:fixed;
+    inset:0;
+    background:
+      radial-gradient(circle at 50% 30%, rgba(209,39,90,0.10), transparent 60%),
+      rgba(20,6,11,0.94);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    padding:32px 16px;
+    z-index:100;
+  }
+  .lightbox.show{display:flex;}
+  .lightbox img{
+    max-width:min(90vw, 720px);
+    max-height:65vh;
+    object-fit:contain;
+    box-shadow:0 16px 44px rgba(0,0,0,0.6);
+    background:#1a0a0e;
+    border:1px solid rgba(244,201,209,0.25);
+  }
+  .lightbox-caption{
+    font-family:'Dancing Script',cursive;
+    font-weight:600;
+    font-size:26px;
+    color:var(--rose-soft);
+    margin-top:18px;
+    text-align:center;
+  }
+  .lightbox-actions{
+    display:flex;
+    gap:12px;
+    margin-top:18px;
+  }
+  .btn-secondary{
+    padding:9px 20px;
+    border:1px solid var(--gold-soft);
+    border-radius:3px;
+    background:transparent;
+    color:var(--rose-soft);
+    font-weight:600;
+    font-size:13px;
+    cursor:pointer;
+  }
+  .btn-secondary:hover{background:rgba(244,201,209,0.12);}
+  .lightbox-close{
+    position:absolute;
+    top:18px; right:24px;
+    background:none;
+    border:none;
+    color:var(--rose-soft);
+    font-size:32px;
+    line-height:1;
+    cursor:pointer;
+    opacity:0.85;
+  }
+  .lightbox-close:hover{opacity:1;}
+
+  .empty-state, .loading-state{
+    color:var(--rose-soft);
+    text-align:center;
+    font-family:'Dancing Script',cursive;
+    font-weight:600;
+    font-size:27px;
+    margin-top:34px;
+    text-shadow:0 2px 10px rgba(0,0,0,0.4);
+  }
+
+  .toast{
+    position:fixed;
+    bottom:24px; left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--ink);
+    color:#fdf3f0;
+    padding:10px 20px;
+    border-radius:4px;
+    font-size:13px;
+    border:1px solid rgba(201,162,75,0.4);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s, transform .2s;
+    z-index:200;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  .site-footer{
+    text-align:center;
+    margin-top:64px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+  }
+  .site-footer .rose-flourish{
+    width:20px; height:20px;
+    opacity:0.75;
+  }
+  .site-footer p{
+    font-family:'Dancing Script',cursive;
+    font-weight:600;
+    font-size:19px;
+    line-height:1.5;
+    color:var(--rose-soft);
+    opacity:0.85;
+    margin:0;
+    letter-spacing:0.01em;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .polaroid, .btn-primary, .toast{transition:none;}
+  }
+</style>
+</head>
+<body style="--rose-svg:url('data:image/svg+xml;utf8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Cg fill=%27%23d1275a%27%3E%3Cpath d=%27M32 32C28 22 28 10 32 4C36 10 36 22 32 32Z%27/%3E%3Cpath d=%27M32 32C28 22 28 10 32 4C36 10 36 22 32 32Z%27 transform=%27rotate(60 32 32)%27/%3E%3Cpath d=%27M32 32C28 22 28 10 32 4C36 10 36 22 32 32Z%27 transform=%27rotate(120 32 32)%27/%3E%3Cpath d=%27M32 32C28 22 28 10 32 4C36 10 36 22 32 32Z%27 transform=%27rotate(180 32 32)%27/%3E%3Cpath d=%27M32 32C28 22 28 10 32 4C36 10 36 22 32 32Z%27 transform=%27rotate(240 32 32)%27/%3E%3Cpath d=%27M32 32C28 22 28 10 32 4C36 10 36 22 32 32Z%27 transform=%27rotate(300 32 32)%27/%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%276%27 fill=%27%23c9a24b%27/%3E%3C/g%3E%3C/svg%3E') center/contain no-repeat;">
+
+<div class="bg-rose bg-rose--1"></div>
+<div class="bg-rose bg-rose--2"></div>
+<div class="bg-rose bg-rose--3"></div>
+
+<div class="board-frame">
+  <header>
+    <div class="header-row">
+      <span class="rose-flourish left"></span>
+      <h1>Love in Bloom</h1>
+      <span class="rose-flourish right"></span>
+    </div>
+    <p>pin a memory, watch it bloom into a rose — kept safe in your Google Sheet</p>
+    <div class="divider"><span class="rose-flourish"></span></div>
+  </header>
+
+  <div class="upload-card">
+    <h2>Plant a New Memory</h2>
+    <div class="drop-zone" id="dropZone">
+      <span id="dropZoneText">Click to choose a photo, or drag one here</span>
+      <input type="file" id="fileInput" accept="image/*">
+    </div>
+    <div class="preview-wrap" id="previewWrap" style="display:none;">
+      <img id="previewImg" alt="Preview">
+    </div>
+    <div class="upload-actions">
+      <input type="text" id="captionInput" placeholder="a little love note (optional)">
+      <button class="btn-primary" id="saveBtn" disabled>Pin the Rose</button>
+    </div>
+  </div>
+
+  <div id="galleryStatus" class="loading-state" style="display:none;">gathering your roses…</div>
+  <div class="gallery" id="gallery"></div>
+
+  <footer class="site-footer">
+    <span class="rose-flourish"></span>
+    <p>created with lots and lots of love<br>#divansidiaries</p>
+  </footer>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose" aria-label="Close">&times;</button>
+  <img id="lightboxImg" src="" alt="">
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+  <div class="lightbox-actions">
+    <button class="btn-secondary" id="lightboxShare">Share</button>
+    <button class="btn-secondary" id="lightboxDownload">Download</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  // ======================================================================
+  // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL BELOW (ends in /exec)
+  // See README.md for how to get this URL.
+  // ======================================================================
+  const apiUrl = 'https://script.google.com/macros/s/AKfycbyZLDXEfDZj4cINL7zAmlRur9iFwpja9n9tfrkQ_jgF0tv0qblABM353f6Z_xQdlW6JoA/exec';
+  // ======================================================================
+
+  const $ = (id) => document.getElementById(id);
+  const dropZone = $('dropZone');
+  const dropZoneText = $('dropZoneText');
+  const fileInput = $('fileInput');
+  const previewWrap = $('previewWrap');
+  const previewImg = $('previewImg');
+  const captionInput = $('captionInput');
+  const saveBtn = $('saveBtn');
+  const gallery = $('gallery');
+  const galleryStatus = $('galleryStatus');
+  const toastEl = $('toast');
+
+  let pendingImageData = null; // base64 string ready to upload
+
+  function showToast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    setTimeout(() => toastEl.classList.remove('show'), 2400);
+  }
+
+  // ---- file selection / drag & drop ----
+  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  });
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
+  });
+
+  function handleFile(file){
+    if (!file.type.startsWith('image/')) {
+      showToast('Please choose an image file');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e){
+      resizeAndCompress(e.target.result, function(compressedDataUrl){
+        pendingImageData = compressedDataUrl;
+        previewImg.src = compressedDataUrl;
+        previewWrap.style.display = 'block';
+        dropZoneText.textContent = file.name;
+        saveBtn.disabled = false;
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // Resize to keep well under Google Sheets' ~50,000 character cell limit
+  function resizeAndCompress(dataUrl, callback){
+    const img = new Image();
+    img.onload = function(){
+      const maxDim = 700;
+      let { width, height } = img;
+      if (width > height && width > maxDim) {
+        height = Math.round(height * (maxDim / width));
+        width = maxDim;
+      } else if (height > maxDim) {
+        width = Math.round(width * (maxDim / height));
+        height = maxDim;
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      callback(canvas.toDataURL('image/jpeg', 0.6));
+    };
+    img.src = dataUrl;
+  }
+
+  // ---- save (pin) a photo ----
+  saveBtn.addEventListener('click', async function(){
+    if (!isConfigured()) { showToast('Set your Apps Script URL in index.html first'); return; }
+    if (!pendingImageData) return;
+    if (pendingImageData.length > 45000) {
+      showToast('Image still too large after compression — try a smaller photo');
+      return;
+    }
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Pinning…';
+    try {
+      const res = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids CORS preflight
+        body: JSON.stringify({
+          action: 'add',
+          name: captionInput.value.trim() || 'photo',
+          data: pendingImageData
+        })
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Unknown error');
+
+      // reset upload card
+      pendingImageData = null;
+      previewWrap.style.display = 'none';
+      dropZoneText.textContent = 'Click to choose a photo, or drag one here';
+      captionInput.value = '';
+      fileInput.value = '';
+      showToast('A new rose has bloomed on your board!');
+      loadPhotos();
+    } catch (err) {
+      showToast('Could not save: ' + err.message);
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Pin the Rose';
+    }
+  });
+
+  function isConfigured(){
+    return apiUrl && apiUrl.indexOf('PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE') === -1;
+  }
+
+  // ---- load photos ----
+  async function loadPhotos(){
+    if (!isConfigured()) return;
+    galleryStatus.style.display = 'block';
+    galleryStatus.textContent = 'gathering your roses…';
+    gallery.innerHTML = '';
+    try {
+      const res = await fetch(apiUrl, { method: 'GET' });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Unknown error');
+      renderGallery(json.photos || []);
+    } catch (err) {
+      galleryStatus.textContent = 'Could not load photos: ' + err.message;
+    }
+  }
+
+  function renderGallery(photos){
+    if (photos.length === 0) {
+      galleryStatus.textContent = 'The garden is empty — plant your first rose above.';
+      galleryStatus.style.display = 'block';
+      return;
+    }
+    galleryStatus.style.display = 'none';
+    gallery.innerHTML = '';
+    photos.forEach(function(photo){
+      const card = document.createElement('div');
+      card.className = 'polaroid';
+
+      const pin = document.createElement('div');
+      pin.className = 'pin';
+
+      const img = document.createElement('img');
+      img.src = photo.data;
+      img.alt = photo.name || 'photo';
+      img.loading = 'lazy';
+      img.title = 'Click to view full size';
+      img.addEventListener('click', () => openLightbox(photo));
+
+      const caption = document.createElement('div');
+      caption.className = 'caption';
+      caption.textContent = photo.name || '';
+
+      const actions = document.createElement('div');
+      actions.className = 'card-actions';
+
+      const shareBtn = document.createElement('button');
+      shareBtn.className = 'action-link share-link';
+      shareBtn.textContent = 'Share';
+      shareBtn.addEventListener('click', () => sharePhoto(photo));
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'action-link delete-link';
+      delBtn.textContent = 'Remove';
+      delBtn.addEventListener('click', () => deletePhoto(photo.id, card));
+
+      actions.appendChild(shareBtn);
+      actions.appendChild(delBtn);
+
+      card.appendChild(pin);
+      card.appendChild(img);
+      card.appendChild(caption);
+      card.appendChild(actions);
+      gallery.appendChild(card);
+    });
+  }
+
+  async function deletePhoto(id, cardEl){
+    if (!confirm('Remove this photo from the board and the sheet?')) return;
+    cardEl.style.opacity = '0.4';
+    try {
+      const res = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'delete', id: id })
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Unknown error');
+      cardEl.remove();
+      showToast('That rose has been let go');
+    } catch (err) {
+      cardEl.style.opacity = '1';
+      showToast('Could not remove: ' + err.message);
+    }
+  }
+
+  // ---- lightbox (full-size view) ----
+  const lightbox = $('lightbox');
+  const lightboxImg = $('lightboxImg');
+  const lightboxCaption = $('lightboxCaption');
+  const lightboxClose = $('lightboxClose');
+  const lightboxShare = $('lightboxShare');
+  const lightboxDownload = $('lightboxDownload');
+  let currentPhoto = null;
+
+  function openLightbox(photo){
+    currentPhoto = photo;
+    lightboxImg.src = photo.data;
+    lightboxImg.alt = photo.name || 'photo';
+    lightboxCaption.textContent = photo.name || '';
+    lightbox.classList.add('show');
+  }
+
+  function closeLightbox(){
+    lightbox.classList.remove('show');
+    currentPhoto = null;
+  }
+
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', function(e){
+    if (e.target === lightbox) closeLightbox(); // click on backdrop only
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && lightbox.classList.contains('show')) closeLightbox();
+  });
+  lightboxShare.addEventListener('click', () => { if (currentPhoto) sharePhoto(currentPhoto); });
+  lightboxDownload.addEventListener('click', () => { if (currentPhoto) downloadPhoto(currentPhoto); });
+
+  // ---- share / download ----
+  function dataURLtoBlob(dataUrl){
+    const parts = dataUrl.split(',');
+    const mimeMatch = parts[0].match(/:(.*?);/);
+    const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+    const bstr = atob(parts[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) { u8arr[n] = bstr.charCodeAt(n); }
+    return new Blob([u8arr], { type: mime });
+  }
+
+  function downloadPhoto(photo){
+    const a = document.createElement('a');
+    a.href = photo.data;
+    a.download = (photo.name || 'photo').replace(/[^a-z0-9-_]+/gi, '_') + '.jpg';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  async function sharePhoto(photo){
+    try {
+      const blob = dataURLtoBlob(photo.data);
+      const file = new File([blob], (photo.name || 'photo').replace(/[^a-z0-9-_]+/gi, '_') + '.jpg', { type: blob.type });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: photo.name || 'Photo' });
+        return;
+      }
+      if (navigator.share) {
+        // some browsers support share() without file support
+        await navigator.share({ title: photo.name || 'Photo' });
+        return;
+      }
+    } catch (err) {
+      if (err.name === 'AbortError') return; // user cancelled the share sheet
+    }
+    // fallback: browser can't share files, so download instead
+    downloadPhoto(photo);
+    showToast('Sharing isn\'t supported in this browser — downloaded instead');
+  }
+
+  // ---- init ----
+  if (isConfigured()) {
+    loadPhotos();
+  } else {
+    galleryStatus.style.display = 'block';
+    galleryStatus.textContent = 'Set your Apps Script URL at the top of the <script> in index.html to get started.';
+  }
+})();
+</script>
+</body>
+</html>
